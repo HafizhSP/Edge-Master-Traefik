@@ -15,3 +15,16 @@ docker compose up -d
 
 5. Cek Log
 docker logs -f edge-traefik
+
+
+6. Verifikasi
+# pastikan argumen sudah benar (harus ada tlschallenge, ada redirections, tidak ada httpchallenge)
+docker inspect edge-traefik --format '{{json .Args}}' | tr ',' '\n' | egrep 'acme|entrypoints|challenge|redirections'
+
+# cek HTTP -> redirect ke HTTPS
+curl -I http://halohub.id
+# cek HTTPS normal
+curl -I https://halohub.id
+
+# (opsional) dashboard
+open https://traefik.hafizhsp.site
