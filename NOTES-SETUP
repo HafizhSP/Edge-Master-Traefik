@@ -1,0 +1,17 @@
+1. Clone + Setup DNS
+Tambahkan A-record traefik.hafizhsp.site → IP server
+
+2. Create Folder letsencrypt
+mkdir -p letsencrypt
+touch letsencrypt/acme.json
+chmod 600 letsencrypt/acme.json
+
+3. Copy ENV
+cp .env.example .env
+
+4. Running
+docker network create edge
+docker compose up -d
+
+5. Cek Log
+docker logs -f edge-traefik
