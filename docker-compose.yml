@@ -16,8 +16,8 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       # redirect HTTP -> HTTPS (nyaman & aman)
-      # - --entrypoints.web.http.redirections.entryPoint.to=websecure
-      # - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
 
       # Let's Encrypt (ACME)
       - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL}
