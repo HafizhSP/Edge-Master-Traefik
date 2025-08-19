@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: edge-traefik
+    restart: unless-stopped
+
+    # Konfigurasi Traefik (tidak pakai file terpisah; langsung via args)
+    command:
+      # Provider Docker
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+
+      # Entrypoints
+      - --entrypoints.web.address=:80
+      # redirect HTTP -> HTTPS (nyaman & aman)
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --entrypoints.websecure.address=:443
+
+      # Let's Encrypt (ACME)
+      - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge=true
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+
+      # (opsional) dashboard Traefik
+      - --api.dashboard=true
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+
+    networks:
+      - edge
+
+    # (opsional) expose dashboard dengan domain sendiri
+    # Isi TRAEFIK_DASHBOARD_HOST di .env agar rule ini aktif
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_DASHBOARD_HOST}`)
+      - traefik.http.routers.dashboard.entrypoints=websecure
+      - traefik.http.routers.dashboard.tls.certresolver=le
+      - traefik.http.routers.dashboard.service=api@internal
+      # (opsional) Basic Auth; isi DASHBOARD_USERS dengan htpasswd
+      - traefik.http.middlewares.dashboard-auth.basicauth.users=${DASHBOARD_USERS}
+      - traefik.http.routers.dashboard.middlewares=dashboard-auth
+
+networks:
+  edge:
+    external: true # semua proyek lain akan join ke network bernama "edge"
