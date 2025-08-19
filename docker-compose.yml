@@ -22,8 +22,9 @@ services:
       # Let's Encrypt (ACME)
       - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL}
       - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
-      - --certificatesresolvers.le.acme.httpchallenge=true
-      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      # - --certificatesresolvers.le.acme.httpchallenge=true
+      # - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.le.acme.tlschallenge=true # << pakai TLS-ALPN
 
       # (opsional) dashboard Traefik
       - --api.dashboard=true
